@@ -1,0 +1,19 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LU2_API_Herkansing.Models
+{
+	public class Environment2D
+	{
+		
+		public Guid ID { get; set; }
+
+		[Required]
+		public string? Name { get; set; }
+
+		[Required]
+		public float Width { get; set; }
+
+		[Required]
+		public float Height { get; set; }
+	}
+}

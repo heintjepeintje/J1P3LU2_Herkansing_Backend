@@ -1,0 +1,6 @@
+@LU2_API_Herkansing_HostAddress = http://localhost:5266
+
+GET {{LU2_API_Herkansing_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
