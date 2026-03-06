@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace LU2_API_Herkansing.Authentication
 {
@@ -8,11 +9,9 @@ namespace LU2_API_Herkansing.Authentication
 
 		public Guid? GetCurrentUserId()
 		{
-			if (!Guid.TryParse(
-				_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value, 
-				out Guid result))
-				return null;
-			return result;
+			string? userId = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			if (userId.IsNullOrEmpty()) return null;
+			return Guid.Parse(userId);
 		}
 	}
 }

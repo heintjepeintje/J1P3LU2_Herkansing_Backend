@@ -7,6 +7,8 @@ namespace LU2_API_Herkansing.Models
 		
 		public Guid ID { get; set; }
 
+		public Guid UserID { get; set; }
+
 		[Required]
 		public string? Name { get; set; }
 

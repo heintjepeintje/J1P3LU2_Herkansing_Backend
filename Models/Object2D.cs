@@ -4,7 +4,6 @@ namespace LU2_API_Herkansing.Models
 {
 	public class Object2D
 	{
-		[Required]
 		public Guid ID { get; set; }
 
 		[Required]

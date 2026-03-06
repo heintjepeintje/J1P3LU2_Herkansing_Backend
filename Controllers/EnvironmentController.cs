@@ -9,82 +9,68 @@ namespace LU2_API_Herkansing.Controllers
 	[ApiController]
 	[Authorize]
 	[Route("environments")]
-	public class EnvironmentController(IEnvironmentRespository environmentRepository, IUserEnvironmentRepository userEnvironmentRepository, IAuthenticationService auth) : ControllerBase
+	public class EnvironmentController(IEnvironmentRepository environmentRepository, IAuthenticationService auth) : ControllerBase
 	{
+		private readonly IEnvironmentRepository _environmentRepository = environmentRepository;
 		private readonly IAuthenticationService _authenticationService = auth;
-		private readonly IEnvironmentRespository _environmentRepository = environmentRepository;
-		private readonly IUserEnvironmentRepository _userEnvironmentRepository = userEnvironmentRepository;
 
 		[Authorize]
 		[HttpPost]
 		public ActionResult<Guid> CreateEnvironment(Environment2D newEnvironment)
 		{
-			Guid? currentUser = _authenticationService.GetCurrentUserId();
-			if (currentUser == null) return Unauthorized();
+			Guid? currentUserId = _authenticationService.GetCurrentUserId();
+			if (!currentUserId.HasValue) return Unauthorized();
 
-			if (newEnvironment.Name == null || newEnvironment.Name.Length == 0) return BadRequest("Environment must have a name.");
-			if (newEnvironment.Width == 0) return BadRequest("Width must be greater than 0.");
-			if (newEnvironment.Height == 0) return BadRequest("Height must be greater than 0.");
+			if (newEnvironment.Name == null) return BadRequest("Environment must have a name.");
+			if (newEnvironment.Name.Length == 0 || newEnvironment.Name.Length > 25) return BadRequest("Environment name must be between 1 and 25 characters long.");
+			if (newEnvironment.Width < 20 || newEnvironment.Width > 200) return BadRequest("Width must be between 20 and 200 units.");
+			if (newEnvironment.Height < 10 || newEnvironment.Height > 100) return BadRequest("Height must be between 10 and 100 units.");
 
-			IEnumerable<Guid> userEnvironments = _userEnvironmentRepository.GetUserEnvironments(currentUser.Value);
-			foreach (Guid userEnvironmentId in userEnvironments)
-			{
-				Environment2D? environment = _environmentRepository.GetEnvironmentById(userEnvironmentId);
-				if (environment == null) continue;
-				if (environment.Name.ToLower().Equals(newEnvironment.Name.ToLower())) return BadRequest("A world with that name already exists.");
-			}
+			IEnumerable<Environment2D> userEnvironments = _environmentRepository.GetEnvironmentsByUser(currentUserId.Value);
+			if (userEnvironments.Count() >= 5) return BadRequest("You cannot have more than 5 environments.");
+			if (userEnvironments.Any(environment => environment.Name == newEnvironment.Name)) return BadRequest("Environment name must be unique.");
 
-			Guid environmentId = Guid.NewGuid();
-			newEnvironment.ID = environmentId;
+			Guid newEnvironmentId = Guid.NewGuid();
+			newEnvironment.ID = newEnvironmentId;
+			newEnvironment.UserID = currentUserId.Value;
+
 			_environmentRepository.CreateEnvironment(newEnvironment);
 
-			UserEnvironment userEnvironment = new(currentUser.Value, environmentId);
-			_userEnvironmentRepository.CreateUserEnvironment(userEnvironment);
-
-			return Ok(environmentId);
-		}
-
-		[Authorize]
-		[HttpGet("id={id:Guid}")]
-		public ActionResult<Environment2D> GetEnvironmentById(Guid id)
-		{
-			Guid? userId = _authenticationService.GetCurrentUserId();
-			if (userId == null) return Unauthorized("Invalid user.");
-
-			IEnumerable<UserEnvironment> environmentUsers = _userEnvironmentRepository.GetUserEnvironmentsByEnvironmentId(id);
-			if (environmentUsers == null || !environmentUsers.Any()) return NotFound("Environment users could not be found.");
-			if (!environmentUsers.Any(env => env.EnvironmentID == id)) return Unauthorized("Environment could not be found.");
-
-			Environment2D? environment = _environmentRepository.GetEnvironmentById(id);
-			if (environment == null) return NotFound("Environment could not be found.");
-
-			return Ok(environment);
+			return Ok(newEnvironment.ID);
 		}
 
 		[Authorize]
 		[HttpGet]
-		public ActionResult<IEnumerable<Environment2D>?> GetEnvironments()
+		public ActionResult<Environment2D> GetEnvironment(Guid? id)
 		{
-			Guid? userId = _authenticationService.GetCurrentUserId();
-			if (userId == null) return Unauthorized("Invalid user.");
+			
+			Guid? currentUserId = _authenticationService.GetCurrentUserId();
+			if (!currentUserId.HasValue) return Unauthorized();
 
-			IEnumerable<UserEnvironment> userEnvironments = _userEnvironmentRepository.GetUserEnvironmentsByUserId(userId.Value);
-			IEnumerable<Environment2D?> environments = userEnvironments.Select(env => _environmentRepository.GetEnvironmentById(env.EnvironmentID));
+			if (id.HasValue) {
+				Environment2D? environment = _environmentRepository.GetEnvironmentById(id.Value);
 
-			return Ok(environments);
+				// We dont give a more specific response message for security reasons.
+				if (environment == null || environment.UserID != currentUserId) return NotFound("Environment could not be found.");
+	
+				return Ok(environment);
+			} else {
+				IEnumerable<Environment2D> environments = _environmentRepository.GetEnvironmentsByUser(currentUserId.Value);
+				return Ok(environments);
+			}
 		}
 
 		[Authorize]
-		[HttpDelete("id={id:Guid}")]
-		public ActionResult DeleteEnvironment([FromRoute] Guid id)
+		[HttpDelete]
+		public ActionResult DeleteEnvironment(Guid id)
 		{
-			Guid? userId = _authenticationService.GetCurrentUserId();
-			if (userId == null) return Unauthorized("Invalid user.");
+			Guid? currentUserId = _authenticationService.GetCurrentUserId();
+			if (!currentUserId.HasValue) return Unauthorized();
 
-			Guid? environmentOwner = _userEnvironmentRepository.GetEnvironmentOwner(id);
-			if (environmentOwner != userId) return Unauthorized();
+			Environment2D? environment = _environmentRepository.GetEnvironmentById(id);
+			if (environment == null || environment?.UserID != currentUserId) return NotFound("Environment could not be found.");
 
-
+			_environmentRepository.DeleteEnvironment(id);
 
 			return Ok();
 		}

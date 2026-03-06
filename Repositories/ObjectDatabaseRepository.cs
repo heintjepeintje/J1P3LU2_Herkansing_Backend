@@ -53,7 +53,13 @@ namespace LU2_API_Herkansing.Repositories
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute("DELETE FROM [Objects] WHERE ID = @ID", new { id });
+			sqlConnection.Execute("DELETE FROM [Objects] WHERE ID = @ID", new { ID = id });
+		}
+
+		public void DeleteEnvironmentObjects(Guid environmentId) {
+			SqlConnection sqlConnection = new(_sqlConnectionString);
+
+			sqlConnection.Execute("DELETE FROM [Objects] WHERE EnvironmentID = @EnvironmentID", new { EnvironmentID = environmentId });
 		}
 	}
 }

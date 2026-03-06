@@ -34,10 +34,9 @@ identityBuilder.AddDapperStores(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAuthenticationService, AspNetAuthenticationService>();
 builder.Services.AddScoped<AspNetAuthenticationService>();
-builder.Services.AddScoped<IEnvironmentRespository>(provider => new EnvironmentDatabaseRepository(sqlConnectionString));
+builder.Services.AddScoped<IEnvironmentRepository>(provider => new EnvironmentDatabaseRepository(sqlConnectionString));
 builder.Services.AddScoped<IObjectRepository>(provider => new ObjectDatabaseRepository(sqlConnectionString));
-builder.Services.AddScoped<IUserEnvironmentRepository>(provider => new UserEnvironmentDatabaseRepository(sqlConnectionString));
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddOpenApi();
 
 WebApplication app = builder.Build();

@@ -8,6 +8,7 @@ namespace LU2_API_Herkansing.Interfaces
 		public Object2D? GetObject(Guid id);
 		public IEnumerable<Object2D> GetEnvironmentObjects(Guid environmentId);
 		public void UpdateObject(Object2D obj);
+		public void DeleteEnvironmentObjects(Guid environmentId);
 		public void DeleteObject(Guid id);
 	}
 }
