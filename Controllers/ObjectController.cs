@@ -35,7 +35,7 @@ namespace LU2_API_Herkansing.Controllers
 		}
 
 		[Authorize]
-		[HttpGet("environment={environmentId:Guid}")]
+		[HttpGet]
 		public ActionResult<Object2D> GetObjects(Guid environmentId) {
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
@@ -56,13 +56,16 @@ namespace LU2_API_Herkansing.Controllers
 			Environment2D? environment = _environmentRepository.GetEnvironmentById(updatedObject.EnvironmentID);
 			if (environment == null || environment.UserID != currentUserId) return NotFound("Environment could not be found.");
 
+			IEnumerable<Object2D> objects = _objectRepository.GetEnvironmentObjects(updatedObject.EnvironmentID);
+			if (!objects.Any(obj => obj.ID == updatedObject.ID)) return NotFound("Object could not be found.");
+
 			_objectRepository.UpdateObject(updatedObject);
 
 			return Ok();
 		}
 
 		[Authorize]
-		[HttpDelete("object={objectId:Guid}")]
+		[HttpDelete]
 		public ActionResult DeleteObject(Guid objectId) {
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
