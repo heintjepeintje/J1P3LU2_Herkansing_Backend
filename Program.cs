@@ -1,6 +1,7 @@
 using LU2_API_Herkansing.Authentication;
 using LU2_API_Herkansing.Interfaces;
 using LU2_API_Herkansing.Repositories;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Identity;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,11 @@ builder.Services.AddScoped<IEnvironmentRepository>(provider => new EnvironmentDa
 builder.Services.AddScoped<IObjectRepository>(provider => new ObjectDatabaseRepository(sqlConnectionString));
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddOpenApi();
+builder.Services.AddOptions<BearerTokenOptions>(IdentityConstants.BearerScheme)
+	.Configure(options =>
+	{
+		options.BearerTokenExpiration = TimeSpan.FromMinutes(60);
+	});
 
 WebApplication app = builder.Build();
 
