@@ -97,10 +97,7 @@ namespace LU2_API_Herkansing.Controllers
 			Environment2D? environment = _environmentRepository.GetEnvironmentById(environmentId);
 			if (environment == null || environment?.UserID != currentUserId) return NotFound("Environment could not be found.");
 
-			IEnumerable<Object2D> environmentObjects = _objectRepository.GetEnvironmentObjects(environmentId);
-			foreach (Object2D obj in environmentObjects) {
-				_objectRepository.DeleteObject(obj.ID);
-			}
+			_objectRepository.DeleteEnvironmentObjects(environmentId);
 
 			bool success = _environmentRepository.DeleteEnvironment(environmentId);
 
