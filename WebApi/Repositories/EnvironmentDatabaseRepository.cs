@@ -51,9 +51,7 @@ namespace LU2_API_Herkansing.Repositories
 
 			int rowsAffected = sqlConnection.Execute(
 				"UPDATE [Environments] SET " +
-				"Name = @Name" +
-				"Width = @Width" +
-				"Height = @Height",
+				"Name = @Name, Width = @Width, Height = @Height",
 				environment);
 
 			return rowsAffected > 0;

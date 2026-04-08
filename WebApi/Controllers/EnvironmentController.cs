@@ -10,9 +10,10 @@ namespace LU2_API_Herkansing.Controllers
 	[ApiController]
 	[Authorize]
 	[Route("environments")]
-	public class EnvironmentController(IEnvironmentRepository environmentRepository, IAuthenticationService auth) : ControllerBase
+	public class EnvironmentController(IEnvironmentRepository environmentRepository, IObjectRepository objectRepository, IAuthenticationService auth) : ControllerBase
 	{
 		private readonly IEnvironmentRepository _environmentRepository = environmentRepository;
+		private readonly IObjectRepository _objectRepository = objectRepository;
 		private readonly IAuthenticationService _authenticationService = auth;
 
 		[Authorize]
@@ -69,6 +70,18 @@ namespace LU2_API_Herkansing.Controllers
 			Environment2D? foundEnvironment = _environmentRepository.GetEnvironmentById(environment.ID);
 			if (foundEnvironment == null || foundEnvironment?.UserID != currentUserId) return NotFound("Environment could not be found.");
 
+			if (environment.Name != null) {
+				if (environment.Name.Length == 0 || environment.Name.Length > 25) return BadRequest("Environment name must be between 1 and 25 characters long.");
+			}
+
+			if (environment.Width != 0) {
+				if (environment.Width < 20 || environment.Width > 200) return BadRequest("Width must be between 20 and 200 units.");
+			}
+
+			if (environment.Height != 0) {
+				if (environment.Height < 10 || environment.Height > 100) return BadRequest("Height must be between 10 and 100 units.");
+			}
+
 			bool success = _environmentRepository.UpdateEnvironment(environment);
 
 			return success ? Ok() : NotFound("An unknown error occurred.");
@@ -83,6 +96,11 @@ namespace LU2_API_Herkansing.Controllers
 
 			Environment2D? environment = _environmentRepository.GetEnvironmentById(environmentId);
 			if (environment == null || environment?.UserID != currentUserId) return NotFound("Environment could not be found.");
+
+			IEnumerable<Object2D> environmentObjects = _objectRepository.GetEnvironmentObjects(environmentId);
+			foreach (Object2D obj in environmentObjects) {
+				_objectRepository.DeleteObject(obj.ID);
+			}
 
 			bool success = _environmentRepository.DeleteEnvironment(environmentId);
 
