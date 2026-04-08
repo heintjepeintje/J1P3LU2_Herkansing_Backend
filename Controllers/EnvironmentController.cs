@@ -43,7 +43,6 @@ namespace LU2_API_Herkansing.Controllers
 		[HttpGet]
 		public ActionResult<Environment2D> GetEnvironment(Guid? id)
 		{
-			
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
