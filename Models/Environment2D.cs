@@ -13,9 +13,9 @@ namespace LU2_API_Herkansing.Models
 		public string? Name { get; set; }
 
 		[Required]
-		public int Width { get; set; }
+		public float Width { get; set; }
 
 		[Required]
-		public int Height { get; set; }
+		public float Height { get; set; }
 	}
 }

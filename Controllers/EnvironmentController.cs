@@ -41,14 +41,14 @@ namespace LU2_API_Herkansing.Controllers
 
 		[Authorize]
 		[HttpGet]
-		public ActionResult<Environment2D> GetEnvironment(Guid? environmentId)
+		public ActionResult<Environment2D> GetEnvironment(Guid? id)
 		{
 			
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
-			if (environmentId.HasValue) {
-				Environment2D? environment = _environmentRepository.GetEnvironmentById(environmentId.Value);
+			if (id.HasValue) {
+				Environment2D? environment = _environmentRepository.GetEnvironmentById(id.Value);
 
 				// We dont give a more specific response message for security reasons.
 				if (environment == null || environment.UserID != currentUserId) return NotFound("Environment could not be found.");
@@ -62,16 +62,15 @@ namespace LU2_API_Herkansing.Controllers
 
 		[Authorize]
 		[HttpDelete]
-		public ActionResult DeleteEnvironment(Guid environmentId)
+		public ActionResult DeleteEnvironment(Guid id)
 		{
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
-			Environment2D? environment = _environmentRepository.GetEnvironmentById(environmentId);
-			if (environment == null) return NotFound("Environment is null.");
+			Environment2D? environment = _environmentRepository.GetEnvironmentById(id);
 			if (environment == null || environment?.UserID != currentUserId) return NotFound("Environment could not be found.");
 
-			_environmentRepository.DeleteEnvironment(environmentId);
+			_environmentRepository.DeleteEnvironment(id);
 
 			return Ok();
 		}

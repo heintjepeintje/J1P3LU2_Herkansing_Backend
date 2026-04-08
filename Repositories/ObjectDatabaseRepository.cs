@@ -24,7 +24,7 @@ namespace LU2_API_Herkansing.Repositories
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			return sqlConnection.QuerySingleOrDefault<Object2D>(
+			return sqlConnection.QuerySingleOrDefault(
 				"SELECT * FROM [Objects] WHERE ID = @ID",
 				new { id });
 		}
@@ -43,9 +43,9 @@ namespace LU2_API_Herkansing.Repositories
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
 			sqlConnection.Execute(
-				"UPDATE [Objects] SET " +
-				"PrefabID = @PrefabID, X = @X, Y = @Y, Width = @Width, Height = @Height, Rotation = @Rotation, Layer = @Layer " +
-				"WHERE ID = @ID AND EnvironmentID = @EnvironmentID",
+				"UPDATE [Objects] SET" +
+				"(PrefabID, X, Y, Width, Height, Rotation, Layer) VALUES" +
+				"(@PrefabID, @X, @Y, @Width, @Height, @Rotation, @Layer) WHERE ID = @ID AND EnvironmentID = @EnvironmentID",
 				obj);
 		}
 

@@ -2,6 +2,9 @@
 using LU2_API_Herkansing.Interfaces;
 using LU2_API_Herkansing.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Hosting;
+using System;
+using System.Data.Common;
 
 namespace LU2_API_Herkansing.Repositories
 {
@@ -21,8 +24,6 @@ namespace LU2_API_Herkansing.Repositories
 		public Environment2D? GetEnvironmentById(Guid environmentId)
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
-
-
 
 			Environment2D? environment = sqlConnection.QuerySingleOrDefault<Environment2D>(
 				"SELECT * FROM [Environments] WHERE ID = @ID",
