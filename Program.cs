@@ -11,7 +11,7 @@ builder.Configuration.AddUserSecrets<Program>(true);
 string? sqlConnectionString = Environment.GetEnvironmentVariable("SqlConnectionString") ?? builder.Configuration.GetValue<string>("SqlConnectionString");
 if (sqlConnectionString == null)
 {
-	throw new Exception("SQL connection string cannot be null");
+	throw new Exception("SQL connection string cannot be null.");
 }
 
 builder.Services.AddAuthorization();
@@ -52,7 +52,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.Map("/", () => $"The API is up and running. ({sqlConnectionString})");
+app.Map("/", () => $"The API is up and running.");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
