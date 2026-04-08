@@ -13,21 +13,21 @@ namespace LU2_API_Herkansing.Models
 		public string? PrefabID { get; set; }
 
 		[Required]
-		public float X { get; set; }
+		public int X { get; set; }
 
 		[Required]
-		public float Y { get; set; }
+		public int Y { get; set; }
 
 		[Required]
-		public float Width { get; set; }
+		public int Width { get; set; }
 
 		[Required]
-		public float Height { get; set; }
+		public int Height { get; set; }
 
 		[Required]
-		public float Rotation { get; set; }
+		public int Rotation { get; set; }
 
 		[Required]
-		public float Layer { get; set; }
+		public int Layer { get; set; }
 	}
 }

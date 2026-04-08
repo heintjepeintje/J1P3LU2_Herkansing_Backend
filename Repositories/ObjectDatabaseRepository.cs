@@ -9,15 +9,17 @@ namespace LU2_API_Herkansing.Repositories
 	{
 		private readonly string _sqlConnectionString = sqlConnectionString;
 
-		public void CreateObject(Object2D obj)
+		public bool CreateObject(Object2D obj)
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute(
+			int rowsAffected = sqlConnection.Execute(
 				"INSERT INTO [Objects]" +
 				"(ID, EnvironmentID, PrefabID, X, Y, Width, Height, Rotation, Layer) VALUES" +
 				"(@ID, @EnvironmentID, @PrefabID, @X, @Y, @Width, @Height, @Rotation, @Layer)",
 				obj);
+
+			return rowsAffected > 0;
 		}
 		
 		public Object2D? GetObject(Guid id)
@@ -38,28 +40,33 @@ namespace LU2_API_Herkansing.Repositories
 				new { EnvironmentID = environmentId });
 		}
 
-		public void UpdateObject(Object2D obj)
+		public bool UpdateObject(Object2D obj)
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute(
-				"UPDATE [Objects] SET" +
-				"(PrefabID, X, Y, Width, Height, Rotation, Layer) VALUES" +
-				"(@PrefabID, @X, @Y, @Width, @Height, @Rotation, @Layer) WHERE ID = @ID AND EnvironmentID = @EnvironmentID",
+			int rowsAffected = sqlConnection.Execute(
+				"UPDATE [Objects] SET " +
+				"PrefabID = @PrefabID, X = @X, Y = @Y, Width = @Width, Height = @Height, Rotation = @Rotation, Layer = @Layer " +
+				"WHERE ID = @ID AND EnvironmentID = @EnvironmentID",
 				obj);
+
+			return rowsAffected > 0;
 		}
 
-		public void DeleteObject(Guid id)
+		public bool DeleteObject(Guid id)
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute("DELETE FROM [Objects] WHERE ID = @ID", new { ID = id });
+			int rowsAffected = sqlConnection.Execute("DELETE FROM [Objects] WHERE ID = @ID", new { ID = id });
+
+			return rowsAffected > 0;
 		}
 
-		public void DeleteEnvironmentObjects(Guid environmentId) {
+		public bool DeleteEnvironmentObjects(Guid environmentId) {
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute("DELETE FROM [Objects] WHERE EnvironmentID = @EnvironmentID", new { EnvironmentID = environmentId });
+			int rowsAffected = sqlConnection.Execute("DELETE FROM [Objects] WHERE EnvironmentID = @EnvironmentID", new { EnvironmentID = environmentId });
+			return rowsAffected > 0;
 		}
 	}
 }

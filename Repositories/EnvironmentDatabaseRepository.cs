@@ -12,13 +12,15 @@ namespace LU2_API_Herkansing.Repositories
 	{
 		private readonly string _sqlConnectionString = sqlConnectionString;
 
-		public void CreateEnvironment(Environment2D environment)
+		public bool CreateEnvironment(Environment2D environment)
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute(
+			int rowsAffected = sqlConnection.Execute(
 				"INSERT INTO [Environments] (ID, UserID, Name, Width, Height) VALUES (@ID, @UserID, @Name, @Width, @Height)",
 				environment);
+
+			return rowsAffected > 0;
 		}
 
 		public Environment2D? GetEnvironmentById(Guid environmentId)
@@ -43,25 +45,29 @@ namespace LU2_API_Herkansing.Repositories
 		}
 
 
-		public void UpdateEnvironment(Environment2D environment)
+		public bool UpdateEnvironment(Environment2D environment)
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute(
+			int rowsAffected = sqlConnection.Execute(
 				"UPDATE [Environments] SET " +
 				"Name = @Name" +
 				"Width = @Width" +
 				"Height = @Height",
 				environment);
+
+			return rowsAffected > 0;
 		}
 
-		public void DeleteEnvironment(Guid environmentId)
+		public bool DeleteEnvironment(Guid environmentId)
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			sqlConnection.Execute(
+			int rowsAffected = sqlConnection.Execute(
 				"DELETE FROM [Environments] WHERE ID = @ID",
 				new { ID = environmentId });
+
+			return rowsAffected > 0;
 		}
 	}
 }

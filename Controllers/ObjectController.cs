@@ -2,6 +2,7 @@
 using LU2_API_Herkansing.Interfaces;
 using LU2_API_Herkansing.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LU2_API_Herkansing.Controllers
@@ -17,19 +18,28 @@ namespace LU2_API_Herkansing.Controllers
 
 		[Authorize]
 		[HttpPost]
-		public ActionResult<Guid> CreateObject([FromBody] Object2D newObject) {
+		public ActionResult CreateObject([FromBody] IEnumerable<Object2D> newObjects) {
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
-			Environment2D? objectEnvironment = _environmentRepository.GetEnvironmentById(newObject.EnvironmentID);
-			if (objectEnvironment == null || objectEnvironment.UserID != currentUserId) return NotFound("Environment could not be found.");
+			if (newObjects.Any()) return BadRequest("Object count must be greater than 1.");
 
-			Guid newObjectId = Guid.NewGuid();
-			newObject.ID = newObjectId;
+			bool success = true;
 
-			_objectRepository.CreateObject(newObject);
+			foreach (Object2D newObject in newObjects) {
+				Environment2D? objectEnvironment = _environmentRepository.GetEnvironmentById(newObject.EnvironmentID);
+				if (objectEnvironment == null || objectEnvironment.UserID != currentUserId) return NotFound("Environment could not be found.");
 
-			return Ok(newObjectId);
+				Guid newObjectId = Guid.NewGuid();
+				newObject.ID = newObjectId;
+
+				if (!_objectRepository.CreateObject(newObject)) {
+					success = false;
+					break;
+				}
+			}
+
+			return success ? Ok() : NotFound("An unknown error occurred.");
 		}
 
 		[Authorize]
@@ -54,9 +64,12 @@ namespace LU2_API_Herkansing.Controllers
 			Environment2D? environment = _environmentRepository.GetEnvironmentById(updatedObject.EnvironmentID);
 			if (environment == null || environment.UserID != currentUserId) return NotFound("Environment could not be found.");
 
-			_objectRepository.UpdateObject(updatedObject);
+			IEnumerable<Object2D> objects = _objectRepository.GetEnvironmentObjects(updatedObject.EnvironmentID);
+			if (!objects.Any(obj => obj.ID == updatedObject.ID)) return NotFound("Object could not be found.");
 
-			return Ok();
+			bool success = _objectRepository.UpdateObject(updatedObject);
+
+			return success ? Ok() : NotFound("An unknown error occurred.");
 		}
 
 		[Authorize]

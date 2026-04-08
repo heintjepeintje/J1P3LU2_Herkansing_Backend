@@ -2,6 +2,7 @@
 using LU2_API_Herkansing.Interfaces;
 using LU2_API_Herkansing.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LU2_API_Herkansing.Controllers
@@ -34,9 +35,9 @@ namespace LU2_API_Herkansing.Controllers
 			newEnvironment.ID = newEnvironmentId;
 			newEnvironment.UserID = currentUserId.Value;
 
-			_environmentRepository.CreateEnvironment(newEnvironment);
+			bool result = _environmentRepository.CreateEnvironment(newEnvironment);
 
-			return Ok(newEnvironment.ID);
+			return result ? Ok(newEnvironment.ID) : NotFound("An unknown error occurred.");
 		}
 
 		[Authorize]
@@ -60,18 +61,32 @@ namespace LU2_API_Herkansing.Controllers
 		}
 
 		[Authorize]
+		[HttpPut]
+		public ActionResult UpdateEnvironment(Environment2D environment) {
+			Guid? currentUserId = _authenticationService.GetCurrentUserId();
+			if (!currentUserId.HasValue) return Unauthorized();
+
+			Environment2D? foundEnvironment = _environmentRepository.GetEnvironmentById(environment.ID);
+			if (foundEnvironment == null || foundEnvironment?.UserID != currentUserId) return NotFound("Environment could not be found.");
+
+			bool success = _environmentRepository.UpdateEnvironment(environment);
+
+			return success ? Ok() : NotFound("An unknown error occurred.");
+		}
+
+		[Authorize]
 		[HttpDelete]
 		public ActionResult DeleteEnvironment(Guid id)
 		{
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
-			Environment2D? environment = _environmentRepository.GetEnvironmentById(id);
+			Environment2D? environment = _environmentRepository.GetEnvironmentById(environmentId);
 			if (environment == null || environment?.UserID != currentUserId) return NotFound("Environment could not be found.");
 
-			_environmentRepository.DeleteEnvironment(id);
+			bool success = _environmentRepository.DeleteEnvironment(environmentId);
 
-			return Ok();
+			return success ? Ok() : NotFound("An unknown error occurred.");
 		}
 
 	}
