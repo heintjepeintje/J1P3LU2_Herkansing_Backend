@@ -42,13 +42,13 @@ namespace LU2_API_Herkansing.Controllers
 
 		[Authorize]
 		[HttpGet]
-		public ActionResult<Environment2D> GetEnvironment(Guid? id)
+		public ActionResult<Environment2D> GetEnvironment(Guid? environmentId)
 		{
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
-			if (id.HasValue) {
-				Environment2D? environment = _environmentRepository.GetEnvironmentById(id.Value);
+			if (environmentId.HasValue) {
+				Environment2D? environment = _environmentRepository.GetEnvironmentById(environmentId.Value);
 
 				// We dont give a more specific response message for security reasons.
 				if (environment == null || environment.UserID != currentUserId) return NotFound("Environment could not be found.");
@@ -76,7 +76,7 @@ namespace LU2_API_Herkansing.Controllers
 
 		[Authorize]
 		[HttpDelete]
-		public ActionResult DeleteEnvironment(Guid id)
+		public ActionResult DeleteEnvironment(Guid environmentId)
 		{
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();

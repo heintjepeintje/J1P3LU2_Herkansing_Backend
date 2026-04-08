@@ -18,11 +18,11 @@ namespace LU2_API_Herkansing.Controllers
 
 		[Authorize]
 		[HttpPost]
-		public ActionResult CreateObject([FromBody] IEnumerable<Object2D> newObjects) {
+		public ActionResult CreateObject(IEnumerable<Object2D> newObjects) {
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
-			if (newObjects.Any()) return BadRequest("Object count must be greater than 1.");
+			if (!newObjects.Any()) return BadRequest("Object count must be greater than 1.");
 
 			bool success = true;
 
@@ -43,7 +43,7 @@ namespace LU2_API_Herkansing.Controllers
 		}
 
 		[Authorize]
-		[HttpGet("environment={environmentId:Guid}")]
+		[HttpGet]
 		public ActionResult<Object2D> GetObjects(Guid environmentId) {
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
@@ -57,7 +57,7 @@ namespace LU2_API_Herkansing.Controllers
 
 		[Authorize]
 		[HttpPut]
-		public ActionResult UpdateObject([FromBody] Object2D updatedObject) {
+		public ActionResult UpdateObject(Object2D updatedObject) {
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();
 
@@ -73,7 +73,7 @@ namespace LU2_API_Herkansing.Controllers
 		}
 
 		[Authorize]
-		[HttpDelete("object={objectId:Guid}")]
+		[HttpDelete]
 		public ActionResult DeleteObject(Guid objectId) {
 			Guid? currentUserId = _authenticationService.GetCurrentUserId();
 			if (!currentUserId.HasValue) return Unauthorized();

@@ -26,7 +26,7 @@ namespace LU2_API_Herkansing.Repositories
 		{
 			SqlConnection sqlConnection = new(_sqlConnectionString);
 
-			return sqlConnection.QuerySingleOrDefault(
+			return sqlConnection.QuerySingleOrDefault<Object2D>(
 				"SELECT * FROM [Objects] WHERE ID = @ID",
 				new { ID = id });
 		}
