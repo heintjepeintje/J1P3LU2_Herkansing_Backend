@@ -3,8 +3,6 @@ using LU2_API_Herkansing.Interfaces;
 using LU2_API_Herkansing.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using System;
 
 namespace LU2_API_Herkansing.Controllers
 {

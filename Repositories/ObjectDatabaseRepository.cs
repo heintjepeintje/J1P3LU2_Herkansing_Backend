@@ -26,7 +26,7 @@ namespace LU2_API_Herkansing.Repositories
 
 			return sqlConnection.QuerySingleOrDefault(
 				"SELECT * FROM [Objects] WHERE ID = @ID",
-				new { id });
+				new { ID = id });
 		}
 
 		public IEnumerable<Object2D> GetEnvironmentObjects(Guid environmentId)
@@ -35,7 +35,7 @@ namespace LU2_API_Herkansing.Repositories
 
 			return sqlConnection.Query<Object2D>(
 				"SELECT * FROM [Objects] WHERE EnvironmentID = @EnvironmentID",
-				new { environmentId });
+				new { EnvironmentID = environmentId });
 		}
 
 		public void UpdateObject(Object2D obj)
